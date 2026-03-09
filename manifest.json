@@ -1,0 +1,9 @@
+{
+	"id": "anki-408-sync",
+	"name": "408专属同步插件",
+	"version": "1.0.0",
+	"minAppVersion": "0.15.0",
+	"description": "专为 408 备考定制",
+	"author": "Custom",
+	"isDesktopOnly": true
+}
