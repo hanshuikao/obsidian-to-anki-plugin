@@ -74,9 +74,9 @@ class Anki408SyncPlugin extends obsidian.Plugin {
                 return text;
             };
 
-            // 🌟 核心修复：强制包裹左对齐样式，直接打败 Anki 的默认居中！
-            front = `<div style="text-align: left; line-height: 1.6;">${formatToHTML(front)}</div>`;
-            back = `<div style="text-align: left; line-height: 1.6;">${formatToHTML(back)}</div>`;
+            // 强制左对齐的 div 结构
+            front = `<div style="text-align: left !important; line-height: 1.6;">${formatToHTML(front)}</div>`;
+            back = `<div style="text-align: left !important; line-height: 1.6;">${formatToHTML(back)}</div>`;
 
             let note = {
                 deckName: deckName,
@@ -94,20 +94,27 @@ class Anki408SyncPlugin extends obsidian.Plugin {
                 } else {
                     successCount++;
                 }
-            } catch (e) { errorMsg = "Anki 连接失败"; }
+            } catch (e) { 
+                // 🌟 核心升级：一旦出 Bug，直接把底层的具体报错砸到屏幕上！
+                errorMsg = e.message || "未知代码错误"; 
+                console.error("同步详细报错:", e);
+            }
         }
 
         if (successCount > 0) new obsidian.Notice(`✅ 成功同步了 ${successCount} 张卡片！`);
-        else if (errorMsg) new obsidian.Notice(`❌ Anki 拒收，原因: ${errorMsg}`);
+        else if (errorMsg) new obsidian.Notice(`❌ 失败原因: ${errorMsg}`);
         else new obsidian.Notice(`⚠️ 同步了 0 张，请检查 Q: 和 A: 格式。`);
     }
 
     async ankiConnect(action, params) {
-        let response = await fetch('[http://127.0.0.1:8765](http://127.0.0.1:8765)', {
+        // 🌟 核心升级：弃用 fetch，改用 Obsidian 原生特权 API
+        let response = await obsidian.requestUrl({
+            url: 'http://127.0.0.1:8765',
             method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ action: action, version: 6, params: params })
         });
-        return await response.json();
+        return response.json;
     }
 
     arrayBufferToBase64(buffer) {
